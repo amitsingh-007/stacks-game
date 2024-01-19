@@ -1,28 +1,26 @@
+import { TOnFrame } from "@/types/IFrameRunner";
+
 export default class FrameRunner {
-  // var onFrame;
+  private isStarted = false;
+  private isRunning = false;
+  private startTime = Date.now();
+  private lastFrameTime = Date.now();
+  private frameCount = 0;
+  private frameId?: number;
+  private pauseTime?: number;
+  private onFrame?: TOnFrame;
 
-  // const isStarted;
-  // const isRunning;
-
-  // const startTime;
-  // const lastFrameTime;
-  // const frameCount;
-  // const frameId;
-
-  // const pauseTime;
-
-  constructor(onFrame) {
-    this.onFrame = onFrame;
+  constructor() {
     this.reset();
   }
 
-  replaceOnFrame(onFrame) {
+  replaceOnFrame(onFrame: TOnFrame) {
     this.onFrame = onFrame;
   }
 
   start() {
     if (this.isStarted) {
-      throw new Error("cannot start the timer when it is already started");
+      throw new Error("Cannot start the timer when it is already started");
     }
     this.cancelFrame();
     this.reset();
@@ -33,7 +31,7 @@ export default class FrameRunner {
 
   stop() {
     if (!this.isStarted) {
-      throw new Error("cannot stop the timer when it is not started");
+      throw new Error("Cannot stop the timer when it is not started");
     }
     this.cancelFrame();
     this.frameCount = 0;
@@ -44,10 +42,10 @@ export default class FrameRunner {
 
   pause() {
     if (!this.isRunning) {
-      throw new Error("cannot pause when it is not running");
+      throw new Error("Cannot pause when it is not running");
     }
     if (!this.isStarted) {
-      throw new Error("cannot pause when the timer is not started");
+      throw new Error("Cannot pause when the timer is not started");
     }
     this.pauseTime = Date.now();
     this.cancelFrame();
@@ -56,10 +54,10 @@ export default class FrameRunner {
 
   resume() {
     if (this.isRunning) {
-      throw new Error("cannot resume when it is running");
+      throw new Error("Cannot resume when it is running");
     }
     if (this.pauseTime === undefined) {
-      throw new Error("unexpected pauseTime to be undefined when it is paused");
+      throw new Error("Unexpected pauseTime to be undefined when it is paused");
     }
     const pauseLength = Date.now() - this.pauseTime;
     this.startTime = this.startTime + pauseLength;
@@ -74,7 +72,7 @@ export default class FrameRunner {
     const totalDuration = now - this.startTime;
     const frameLength = now - this.lastFrameTime;
 
-    this.onFrame(this.frameCount, frameLength, totalDuration);
+    this.onFrame?.(this.frameCount, frameLength, totalDuration);
 
     // it is possible that the frame handler paused or stopped the game
     if (this.isStarted && this.isRunning) {
