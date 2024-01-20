@@ -1,16 +1,15 @@
 "use client";
 
+import { useDeviceDetect } from "@/providers/DeviceDetectProvider";
 import { getTitle } from "@/utils";
 import { useKeyPressEvent } from "react-use";
 import Board from "../components/Board";
 import useGameModel from "../hooks/useGameModel";
-import { useDeviceDetect } from "@/providers/DeviceDetectProvider";
-import { CONFIG } from "@/constants";
-import { Chip } from "@nextui-org/react";
+import LevelSelector from "@/components/LevelSelector";
 
 export default function Home() {
   const isMobile = useDeviceDetect();
-  const { gameScore, state, action } = useGameModel();
+  const { gameScore, state, action, gameLevel, setGameLevel } = useGameModel();
 
   useKeyPressEvent(" ", action);
 
@@ -25,11 +24,18 @@ export default function Home() {
           {isMobile ? "(Touch to play)" : "(Press SPACEBAR to play)"}
         </div>
       </h1>
-      <div className="text-2xl font-medium mb-10">
-        Score:
-        <span className="font-semibold text-amber-400 [text-shadow:_0_4px_4px_var(--tw-shadow-color)] shadow-amber-500 ml-1">
-          {gameScore}
-        </span>
+      <div className="flex items-center justify-between w-80 md:w-96 mb-10">
+        <div className="text-2xl font-medium">
+          Score:
+          <span className="font-semibold text-amber-400 [text-shadow:_0_4px_4px_var(--tw-shadow-color)] shadow-amber-500 ml-1">
+            {gameScore}
+          </span>
+        </div>
+        <LevelSelector
+          level={gameLevel}
+          setLevel={setGameLevel}
+          gameState={state.gameStatus}
+        />
       </div>
       <Board rows={state.rows} />
     </div>

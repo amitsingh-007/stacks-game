@@ -1,16 +1,17 @@
-import useGameModelStore from "@/store/gameModel";
-import React, { useEffect, useRef, useState } from "react";
+import useGameState from "@/hooks/useGameState";
+import { computeGameScore } from "@/utils/score";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLatest } from "react-use";
 import { CONFIG } from "../constants";
 import GameState from "../enums/GameState";
 import FrameRunner from "../helpers/FrameRunner";
-import { useLatest } from "react-use";
-import { computeGameScore } from "@/utils/score";
+import useLevel from "./useLevel";
 
 const useGameModel = () => {
   const frameRunnerRef = useRef(new FrameRunner());
-  const { state, addRow, setRowPosition, restartGame } = useGameModelStore(
-    (state) => state
-  );
+  const { gameLevel, setGameLevel, levelConfig } = useLevel();
+  const { state, addRow, setRowPosition, restartGame } =
+    useGameState(levelConfig);
   const stateRef = useLatest(state);
   const [gameScore, setGameScore] = useState(0);
 
@@ -25,10 +26,10 @@ const useGameModel = () => {
       totalDuration: number
     ) => {
       const activeRow = state.rows[state.activeRow];
-      const ms = totalDuration % CONFIG.MillisecondsPerIteration;
+      const ms = totalDuration % levelConfig.msPerIteration;
       const uniquePosition = CONFIG.Columns - activeRow.length;
       const totalPositions = uniquePosition * 2;
-      const msPerPosition = CONFIG.MillisecondsPerIteration / totalPositions;
+      const msPerPosition = levelConfig.msPerIteration / totalPositions;
       const currentPosition = Math.floor(ms / msPerPosition);
       const newStart =
         currentPosition > uniquePosition
@@ -38,7 +39,7 @@ const useGameModel = () => {
     };
 
     frameRunnerRef.current.replaceOnFrame(handleFrame);
-  }, [setRowPosition, state.activeRow, state.rows]);
+  }, [levelConfig.msPerIteration, setRowPosition, state.activeRow, state.rows]);
 
   useEffect(() => {
     const frameRunner = frameRunnerRef.current;
@@ -56,7 +57,7 @@ const useGameModel = () => {
     }
   }, [state.gameStatus]);
 
-  const action = React.useCallback(() => {
+  const action = useCallback(() => {
     if (state.gameStatus === GameState.Lost) {
       restartGame();
       frameRunnerRef.current.start();
@@ -65,7 +66,13 @@ const useGameModel = () => {
     }
   }, [addRow, restartGame, state.gameStatus]);
 
-  return { gameScore, state, action };
+  return {
+    gameScore,
+    state,
+    action,
+    gameLevel,
+    setGameLevel,
+  };
 };
 
 export default useGameModel;
