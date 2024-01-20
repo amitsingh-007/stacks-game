@@ -1,5 +1,5 @@
 import Row from "@/helpers/Row";
-import React from "react";
+import React, { Fragment } from "react";
 import { CONFIG } from "../constants";
 import Dot from "./Dot";
 
@@ -16,13 +16,13 @@ const Board = ({ rows }: Props) => {
 
     for (let j = 0; j < CONFIG.Columns; j++) {
       dotColumn.push(
-        <React.Fragment key={`cell-${i}:${j}`}>
+        <Fragment key={`cell-${i}:${j}`}>
           <Dot isOn={row.isOn(j)} />
-        </React.Fragment>
+        </Fragment>
       );
     }
 
-    dotRows.push(<React.Fragment key={`row-${i}`}>{dotColumn}</React.Fragment>);
+    dotRows.push(<Fragment key={`row-${i}`}>{dotColumn}</Fragment>);
   }
 
   return (

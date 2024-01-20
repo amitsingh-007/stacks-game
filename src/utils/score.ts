@@ -1,5 +1,5 @@
 import { CONFIG } from "@/constants";
-import { IGameState } from "@/store/gameModel";
+import { IGameState } from "@/hooks/useGameState";
 
 const LEVEL_SCORE_BOOSTER = 2;
 
