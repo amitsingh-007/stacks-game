@@ -17,12 +17,12 @@ export const metadata: Metadata = {
   description: "Simple single player stacks game",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const nextHeaders = new NextHeaders(headers());
+  const nextHeaders = new NextHeaders(await headers());
 
   return (
     <html lang="en" className="dark">
